@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Automation Lite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            text-align: center;
+            padding: 10px;
+            background-color: #f8f8f8;
+            color: black;
+        }
+        .button-container {
+            margin: 10px auto;
+            text-align: center;
+        }
+        .relay-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        .off {
+            background-color: lightsalmon;
+            color: white;
+        }
+        .on {
+            background-color: mediumseagreen;
+            color: white;
+        }
+        main {
+            flex: 1;
+        }
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #f1f1f1;
+            color: black;
+            position: sticky;
+            bottom: 0;
+        }
+    </style>
+    <script>
+        // Initial states of the relays
+        const relayStates = {
+            26: 'high', // Pin 26: 'low' (on), 'high' (off)
+            20: 'high', // Pin 20: 'low' (on), 'high' (off)
+            21: 'high'  // Pin 21: 'low' (on), 'high' (off)
+        };
+
+       async function fetchInitialStates() {
+            try {
+                const response = await fetch('/pins/');
+                const pins = await response.json();
+
+                pins.forEach(pin => {
+                    relayStates[pin.pin_num] = pin.state;
+                    const button = document.querySelector(`[data-pin="${pin.pin_num}"]`);
+                    if (button) {
+                        updateButtonStyles(button, pin.state);
+                    }
+                });
+            } catch (error) {
+                console.error('Error fetching initial states:', error);
+            }
+        }
+
+        async function toggleRelay(pin, button, state) {
+            const payload = {
+                pin_num: pin,
+                state: state,
+                function: "output"
+            };
+
+            try {
+                await fetch('/pins/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                relayStates[pin] = state;
+                updateButtonStyles(button, state);
+            } catch (error) {
+                console.error('Error updating pin:', error);
+            }
+        }
+
+        function updateButtonStyles(button, state) {
+            if (state === 'low') {
+                button.classList.remove('off');
+                button.classList.add('on');
+                button.textContent = button.textContent.replace('ON', 'OFF');
+            } else {
+                button.classList.remove('on');
+                button.classList.add('off');
+                button.textContent = button.textContent.replace('OFF', 'ON');
+            }
+        }
+
+        function initializeButtons() {
+            fetchInitialStates();
+        }
+        window.onload = initializeButtons;
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Home Automation Lite</h1>
+    </header>
+    <main>
+        <!-- Buttons for Relay 1 -->
+        <div class="button-container">
+            <button
+                class="relay-button off"
+                data-pin="26"
+                onclick="toggleRelay(26, this, relayStates[26] === 'high' ? 'low' : 'high')"
+            >
+                Turn 1 ON
+            </button>
+        </div>
+        <!-- Buttons for Relay 2 -->
+        <div class="button-container">
+            <button
+                class="relay-button off"
+                data-pin="20"
+                onclick="toggleRelay(20, this, relayStates[20] === 'high' ? 'low' : 'high')"
+            >
+                Turn 2 ON
+            </button>
+        </div>
+        <!-- Buttons for Relay 3 -->
+        <div class="button-container">
+            <button
+                class="relay-button off"
+                data-pin="21"
+                onclick="toggleRelay(21, this, relayStates[21] === 'high' ? 'low' : 'high')"
+            >
+                Turn 3 ON
+            </button>
+        </div>
+    </main>
+    <div class="footer">
+        &copy; 2024 Home Automation Lite. All rights reserved.
+    </div>
+</body>
+</html>
+
+
