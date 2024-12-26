@@ -1,9 +1,14 @@
-from flask import Flask
-from flask_restplus import Api, Resource, fields
+from flask import Flask, send_from_directory 
+from flask_restx import Api, Resource, fields
 import RPi.GPIO as GPIO
 
 
 app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return send_from_directory('static', 'index.html')
+
 api = Api(app,
           version='1.0',
           title='RESTful Pi',
@@ -15,8 +20,8 @@ ns = api.namespace('pins', description='Pin related operations')
 pin_model = api.model('pins', {
     'id': fields.Integer(readonly=True, description='The pin unique identifier'),
     'pin_num': fields.Integer(required=True, description='GPIO pin associated with this endpoint'),
-    'color': fields.String(required=True, description='LED color'),
-    'state': fields.String(required=True, description='LED on or off')
+    'function': fields.String(required=True, description='PIN function'),
+    'state': fields.String(required=True, description='low or high')
 })
 
 
@@ -28,6 +33,9 @@ class PinUtil(object):
     def get(self, id):
         for pin in self.pins:
             if pin['id'] == id:
+                # Read the actual GPIO state
+                actual_state = GPIO.input(pin['pin_num'])  # Get the actual state of the pin
+                pin['state'] = 'high' if actual_state == GPIO.HIGH else 'low'  # Set the state as 'high' or 'low'
                 return pin
         api.abort(404, f"pin {id} doesn't exist.")
 
@@ -37,9 +45,10 @@ class PinUtil(object):
         self.pins.append(pin)
         GPIO.setup(pin['pin_num'], GPIO.OUT)
 
-        if pin['state'] == 'off':
+        #set initial state of the pin in GPIO
+        if pin['state'] == 'low':
             GPIO.output(pin['pin_num'], GPIO.LOW)
-        elif pin['state'] == 'on':
+        elif pin['state'] == 'high':
             GPIO.output(pin['pin_num'], GPIO.HIGH)
 
         return pin
@@ -49,9 +58,10 @@ class PinUtil(object):
         pin.update(data)  # this is the dict_object update method
         GPIO.setup(pin['pin_num'], GPIO.OUT)
 
-        if pin['state'] == 'off':
+        #update the GPIO pin state
+        if pin['state'] == 'low':
             GPIO.output(pin['pin_num'], GPIO.LOW)
-        elif pin['state'] == 'on':
+        elif pin['state'] == 'high':
             GPIO.output(pin['pin_num'], GPIO.HIGH)
 
         return pin
@@ -111,16 +121,10 @@ class Pin(Resource):
 GPIO.setmode(GPIO.BCM)
 
 pin_util = PinUtil()
-pin_util.create({'pin_num': 23, 'color': 'red', 'state': 'off'})
-pin_util.create({'pin_num': 24, 'color': 'yellow', 'state': 'off'})
-pin_util.create({'pin_num': 25, 'color': 'blue', 'state': 'off'})
-pin_util.create({'pin_num': 22, 'color': 'red', 'state': 'off'})
-pin_util.create({'pin_num': 12, 'color': 'yellow', 'state': 'off'})
-pin_util.create({'pin_num': 16, 'color': 'blue', 'state': 'off'})
-pin_util.create({'pin_num': 20, 'color': 'red', 'state': 'off'})
-pin_util.create({'pin_num': 21, 'color': 'green', 'state': 'off'})
-pin_util.create({'pin_num': 13, 'color': 'yellow', 'state': 'off'})
-
+pin_util.create({'pin_num': 26, 'function': 'relay_1', 'state': 'high'})
+pin_util.create({'pin_num': 20, 'function': 'relay_2', 'state': 'high'})
+pin_util.create({'pin_num': 21, 'function': 'relay_3', 'state': 'high'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5050)
+    
