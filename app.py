@@ -121,9 +121,15 @@ class Pin(Resource):
 GPIO.setmode(GPIO.BCM)
 
 pin_util = PinUtil()
-pin_util.create({'pin_num': 26, 'function': 'relay_1', 'state': 'high'})
-pin_util.create({'pin_num': 20, 'function': 'relay_2', 'state': 'high'})
-pin_util.create({'pin_num': 21, 'function': 'relay_3', 'state': 'high'})
+pin_util.create({'pin_num': 5, 'function': 'relay_1', 'state': 'high'})   # Channel 1, BCM Pin 5
+pin_util.create({'pin_num': 6, 'function': 'relay_2', 'state': 'high'})   # Channel 2, BCM Pin 6
+pin_util.create({'pin_num': 13, 'function': 'relay_3', 'state': 'high'})  # Channel 3, BCM Pin 13
+pin_util.create({'pin_num': 16, 'function': 'relay_4', 'state': 'high'})  # Channel 4, BCM Pin 16
+pin_util.create({'pin_num': 19, 'function': 'relay_5', 'state': 'high'})  # Channel 5, BCM Pin 19
+pin_util.create({'pin_num': 20, 'function': 'relay_6', 'state': 'high'})  # Channel 6, BCM Pin 20
+pin_util.create({'pin_num': 21, 'function': 'relay_7', 'state': 'high'})  # Channel 7, BCM Pin 21
+pin_util.create({'pin_num': 26, 'function': 'relay_8', 'state': 'high'})  # Channel 8, BCM Pin 26
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5050)
