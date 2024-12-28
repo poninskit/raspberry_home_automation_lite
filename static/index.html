@@ -54,12 +54,17 @@
     <script>
         // Initial states of the relays
         const relayStates = {
-            26: 'high', // Pin 26: 'low' (on), 'high' (off)
-            20: 'high', // Pin 20: 'low' (on), 'high' (off)
-            21: 'high'  // Pin 21: 'low' (on), 'high' (off)
+            5: 'high',  // Pin 5
+            6: 'high',  // Pin 6
+            13: 'high', // Pin 13
+            16: 'high', // Pin 16
+            19: 'high', // Pin 19
+            20: 'high', // Pin 20
+            21: 'high', // Pin 21
+            26: 'high'  // Pin 26
         };
 
-       async function fetchInitialStates() {
+        async function fetchInitialStates() {
             try {
                 const response = await fetch('/pins/');
                 const pins = await response.json();
@@ -122,34 +127,77 @@
         <h1>Home Automation Lite</h1>
     </header>
     <main>
-        <!-- Buttons for Relay 1 -->
+        <!-- Buttons for all 8 relays -->
         <div class="button-container">
             <button
                 class="relay-button off"
-                data-pin="26"
-                onclick="toggleRelay(26, this, relayStates[26] === 'high' ? 'low' : 'high')"
+                data-pin="5"
+                onclick="toggleRelay(5, this, relayStates[5] === 'high' ? 'low' : 'high')"
             >
                 Turn 1 ON
             </button>
         </div>
-        <!-- Buttons for Relay 2 -->
+        <div class="button-container">
+            <button
+                class="relay-button off"
+                data-pin="6"
+                onclick="toggleRelay(6, this, relayStates[6] === 'high' ? 'low' : 'high')"
+            >
+                Turn 2 ON
+            </button>
+        </div>
+        <div class="button-container">
+            <button
+                class="relay-button off"
+                data-pin="13"
+                onclick="toggleRelay(13, this, relayStates[13] === 'high' ? 'low' : 'high')"
+            >
+                Turn 3 ON
+            </button>
+        </div>
+        <div class="button-container">
+            <button
+                class="relay-button off"
+                data-pin="16"
+                onclick="toggleRelay(16, this, relayStates[16] === 'high' ? 'low' : 'high')"
+            >
+                Turn 4 ON
+            </button>
+        </div>
+        <div class="button-container">
+            <button
+                class="relay-button off"
+                data-pin="19"
+                onclick="toggleRelay(19, this, relayStates[19] === 'high' ? 'low' : 'high')"
+            >
+                Turn 5 ON
+            </button>
+        </div>
         <div class="button-container">
             <button
                 class="relay-button off"
                 data-pin="20"
                 onclick="toggleRelay(20, this, relayStates[20] === 'high' ? 'low' : 'high')"
             >
-                Turn 2 ON
+                Turn 6 ON
             </button>
         </div>
-        <!-- Buttons for Relay 3 -->
         <div class="button-container">
             <button
                 class="relay-button off"
                 data-pin="21"
                 onclick="toggleRelay(21, this, relayStates[21] === 'high' ? 'low' : 'high')"
             >
-                Turn 3 ON
+                Turn 7 ON
+            </button>
+        </div>
+        <div class="button-container">
+            <button
+                class="relay-button off"
+                data-pin="26"
+                onclick="toggleRelay(26, this, relayStates[26] === 'high' ? 'low' : 'high')"
+            >
+                Turn 8 ON
             </button>
         </div>
     </main>
@@ -158,5 +206,3 @@
     </div>
 </body>
 </html>
-
-
