@@ -51,7 +51,23 @@
             bottom: 0;
         }
     </style>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
     <script>
+	//Web socket setup
+	const socket = io();
+
+	//Listen for state updates from the server
+	socket.on('state_update', (data) => {
+	    console.log('State update recived: ', data);
+
+	    //update the button state dynamically
+	    const button = document.querySelector(`[data-pin="${data.pin_num}"]`);
+	    if(button){
+	        relayStates[data.pin_num] = data.state;
+		updateButtonStyles(button, data.sate);
+	    }
+	});
+
         // Initial states of the relays
         const relayStates = {
             5: 'high',  // Pin 5

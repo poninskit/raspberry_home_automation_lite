@@ -1,9 +1,14 @@
 from flask import Flask, send_from_directory 
 from flask_restx import Api, Resource, fields
+from flask_socketio import SocketIO, emit
 import RPi.GPIO as GPIO
 
 
 app = Flask(__name__)
+#app.config['SECRET_KEY'] = 'my_secret_key'
+
+#Initilize Flask-SocketIO
+socketio = SocketIO(app, cors_allowed_origins = "*")
 
 @app.route('/')
 def index():
@@ -23,6 +28,13 @@ pin_model = api.model('pins', {
     'function': fields.String(required=True, description='PIN function'),
     'state': fields.String(required=True, description='low or high')
 })
+
+
+
+#Broadcast state changes to all connected clients
+def broadcast_state_change(pin_num, state):
+    """Broadcast pin state changes to all connected clients."""
+    socketio.emit('state_update', {'pin_num': pin_num, 'state': state}, room=None)
 
 
 class PinUtil(object):
@@ -51,6 +63,9 @@ class PinUtil(object):
         elif pin['state'] == 'high':
             GPIO.output(pin['pin_num'], GPIO.HIGH)
 
+        #Broadcast the state change to all connected clients
+        broadcast_state_change(pin['pin_num'], pin['state'])
+
         return pin
 
     def update(self, id, data):
@@ -64,12 +79,19 @@ class PinUtil(object):
         elif pin['state'] == 'high':
             GPIO.output(pin['pin_num'], GPIO.HIGH)
 
+        #Broadcast the state change to all connected clients
+        broadcast_state_change(pin['pin_num'], pin['state'])
+
         return pin
 
     def delete(self, id):
         pin = self.get(id)
         GPIO.output(pin['pin_num'], GPIO.LOW)
         self.pins.remove(pin)
+        
+        #Broadcast the state change to all connected clients
+        broadcast_state_change(pin['pin_num'], 'deleted')
+
 
 
 @ns.route('/')  # keep in mind this our ns-namespace (pins/)
@@ -132,5 +154,6 @@ pin_util.create({'pin_num': 26, 'function': 'relay_8', 'state': 'high'})  # Chan
 
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5050)
+    # Use socketio.run to start the server with broadcast
+    socketio.run(app, debug=True, host='0.0.0.0', port=5050)
     
