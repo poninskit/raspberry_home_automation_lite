@@ -63,7 +63,9 @@
 	    //update the button state dynamically
 	    const button = document.querySelector(`[data-pin="${data.pin_num}"]`);
 	    if(button){
+		//Update the relay states with the new state
 	        relayStates[data.pin_num] = data.state;
+		//Update the button style based on the state
 		updateButtonStyles(button, data.sate);
 	    }
 	});
@@ -129,7 +131,7 @@
                 button.classList.remove('on');
                 button.classList.add('off');
                 button.textContent = button.textContent.replace('OFF', 'ON');
-            }
+	    }
         }
 
         function initializeButtons() {
