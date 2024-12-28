@@ -66,7 +66,7 @@
 		//Update the relay states with the new state
 	        relayStates[data.pin_num] = data.state;
 		//Update the button style based on the state
-		updateButtonStyles(button, data.sate);
+		updateButtonStyles(button, data.state);
 	    }
 	});
 
@@ -123,6 +123,7 @@
         }
 
         function updateButtonStyles(button, state) {
+	    console.log(`Updating styles for button pin ${button.dataset.pin}, state: ${stte}`);
             if (state === 'low') {
                 button.classList.remove('off');
                 button.classList.add('on');
