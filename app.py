@@ -1,9 +1,14 @@
 from flask import Flask, send_from_directory 
 from flask_restx import Api, Resource, fields
+from flask_socketio import SocketIO, emit
 import RPi.GPIO as GPIO
 
 
 app = Flask(__name__)
+#app.config['SECRET_KEY'] = 'my_secret_key'
+
+#Initilize Flask-SocketIO
+socketio = SocketIO(app, cors_allowed_origins = "*")
 
 @app.route('/')
 def index():
@@ -23,6 +28,13 @@ pin_model = api.model('pins', {
     'function': fields.String(required=True, description='PIN function'),
     'state': fields.String(required=True, description='low or high')
 })
+
+
+
+#Broadcast state changes to all connected clients
+def broadcast_state_change(pin_num, state):
+    """Broadcast pin state changes to all connected clients."""
+    socketio.emit('state_update', {'pin_num': pin_num, 'state': state}, room=None)
 
 
 class PinUtil(object):
@@ -51,6 +63,9 @@ class PinUtil(object):
         elif pin['state'] == 'high':
             GPIO.output(pin['pin_num'], GPIO.HIGH)
 
+        #Broadcast the state change to all connected clients
+        broadcast_state_change(pin['pin_num'], pin['state'])
+
         return pin
 
     def update(self, id, data):
@@ -64,12 +79,19 @@ class PinUtil(object):
         elif pin['state'] == 'high':
             GPIO.output(pin['pin_num'], GPIO.HIGH)
 
+        #Broadcast the state change to all connected clients
+        broadcast_state_change(pin['pin_num'], pin['state'])
+
         return pin
 
     def delete(self, id):
         pin = self.get(id)
         GPIO.output(pin['pin_num'], GPIO.LOW)
         self.pins.remove(pin)
+        
+        #Broadcast the state change to all connected clients
+        broadcast_state_change(pin['pin_num'], 'deleted')
+
 
 
 @ns.route('/')  # keep in mind this our ns-namespace (pins/)
@@ -121,10 +143,17 @@ class Pin(Resource):
 GPIO.setmode(GPIO.BCM)
 
 pin_util = PinUtil()
-pin_util.create({'pin_num': 26, 'function': 'relay_1', 'state': 'high'})
-pin_util.create({'pin_num': 20, 'function': 'relay_2', 'state': 'high'})
-pin_util.create({'pin_num': 21, 'function': 'relay_3', 'state': 'high'})
+pin_util.create({'pin_num': 5, 'function': 'relay_1', 'state': 'high'})   # Channel 1, BCM Pin 5
+pin_util.create({'pin_num': 6, 'function': 'relay_2', 'state': 'high'})   # Channel 2, BCM Pin 6
+pin_util.create({'pin_num': 13, 'function': 'relay_3', 'state': 'high'})  # Channel 3, BCM Pin 13
+pin_util.create({'pin_num': 16, 'function': 'relay_4', 'state': 'high'})  # Channel 4, BCM Pin 16
+pin_util.create({'pin_num': 19, 'function': 'relay_5', 'state': 'high'})  # Channel 5, BCM Pin 19
+pin_util.create({'pin_num': 20, 'function': 'relay_6', 'state': 'high'})  # Channel 6, BCM Pin 20
+pin_util.create({'pin_num': 21, 'function': 'relay_7', 'state': 'high'})  # Channel 7, BCM Pin 21
+pin_util.create({'pin_num': 26, 'function': 'relay_8', 'state': 'high'})  # Channel 8, BCM Pin 26
+
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5050)
+    # Use socketio.run to start the server with broadcast
+    socketio.run(app, debug=True, host='0.0.0.0', port=5050)
     
