@@ -143,9 +143,9 @@ class Pin(Resource):
 GPIO.setmode(GPIO.BCM)
 
 pin_util = PinUtil()
-pin_util.create({'pin_num': 37, 'function': 'relay_1', 'state': 'high'})   # Channel 1, BCM Pin 26
-pin_util.create({'pin_num': 38, 'function': 'relay_2', 'state': 'high'})   # Channel 2, BCM Pin 21
-pin_util.create({'pin_num': 40, 'function': 'relay_3', 'state': 'high'})   # Channel 3, BCM Pin 20
+pin_util.create({'pin_num': 26, 'function': 'relay_1', 'state': 'high'})   # Channel 1, GPIO Pin 26
+pin_util.create({'pin_num': 20, 'function': 'relay_2', 'state': 'high'})   # Channel 2, GPIO Pin 20
+pin_util.create({'pin_num': 21, 'function': 'relay_3', 'state': 'high'})   # Channel 3, GPIO Pin 21
 
 
 if __name__ == '__main__':
