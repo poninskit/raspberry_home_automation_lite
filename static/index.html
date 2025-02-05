@@ -72,9 +72,9 @@
 
         // Initial states of the relays
         const relayStates = {
-            37: 'high',  // GPIO 26
-            38: 'high',  // GPIO 20
-            40: 'high',  // GPIO 21
+            26: 'high',  // GPIO 26
+            20: 'high',  // GPIO 20
+            21: 'high',  // GPIO 21
         };
 
         async function fetchInitialStates() {
@@ -145,8 +145,8 @@
         <div class="button-container">
             <button
                 class="relay-button off"
-                data-pin="37"
-                onclick="toggleRelay(37, this, relayStates[37] === 'high' ? 'low' : 'high')"
+                data-pin="26"
+                onclick="toggleRelay(26, this, relayStates[26] === 'high' ? 'low' : 'high')"
             >
                 Turn 1 ON
             </button>
@@ -154,8 +154,8 @@
         <div class="button-container">
             <button
                 class="relay-button off"
-                data-pin="38"
-                onclick="toggleRelay(38, this, relayStates[38] === 'high' ? 'low' : 'high')"
+                data-pin="20"
+                onclick="toggleRelay(20, this, relayStates[20] === 'high' ? 'low' : 'high')"
             >
                 Turn 2 ON
             </button>
@@ -163,8 +163,8 @@
         <div class="button-container">
             <button
                 class="relay-button off"
-                data-pin="40"
-                onclick="toggleRelay(40, this, relayStates[40] === 'high' ? 'low' : 'high')"
+                data-pin="21"
+                onclick="toggleRelay(21, this, relayStates[21] === 'high' ? 'low' : 'high')"
             >
                 Turn 3 ON
             </button>
